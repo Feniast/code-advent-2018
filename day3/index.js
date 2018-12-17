@@ -1,34 +1,54 @@
-const readline = require('readline');
-const fs = require('fs');
 const { parse } = require('./rect.js');
+const { readFile, find } = require('../util');
 
 const rects = [];
-const x = [];
-const y = [];
-const unitRects = [];
+let x = [];
+let y = [];
 
-const readFile = (readLine) => {
-  return new Promise((resolve, reject) => {
-    const rl = readline.createInterface({
-      input: fs.createReadStream('input.txt'),
-      crlfDelay: Infinity
-    });
+const area = (x1, y1, x2, y2) => (x2 - x1) * (y2 - y1);
 
-    rl.on('line', (line) => {
-      readLine(line);
-    });
+const computeArea = (rects, xArr, yArr) => {
+  xArr = [...new Set(x)];
+  yArr = [...new Set(y)];
+  xArr.sort((a, b) => a - b);
+  yArr.sort((a, b) => a - b);
 
-    rl.on('close', () => {
-      resolve();
-    });
-  });
+  let result = 0;
+  const overlayMap = new Map();
+
+  for (let rect of rects) {
+    const l = find(xArr, rect.left);
+    const r = find(xArr, rect.left + rect.width);
+    const t = find(yArr, rect.top);
+    const b = find(yArr, rect.top + rect.height);
+
+    for (let i=l; i<r; i++) {
+      for (let j=t; j<b; j++) {
+        const key = i + '-' + j;
+        if (!overlayMap.has(key)) {
+          overlayMap.set(key, 1);
+        } else {
+          const count = overlayMap.get(key);
+          if (count === 1) {
+            overlayMap.set(key, count + 1);
+            result += area(xArr[i], yArr[j], xArr[i+1], yArr[j+1]);
+          }
+        }
+      }
+    }
+  }
+
+  return result;
 };
 
-readFile((line) => {
+readFile('input.txt', (line) => {
   const rect = parse(line);
   if (rect) {
     rects.push(rect);
+    x.push(rect.left, rect.left + rect.width);
+    y.push(rect.top, rect.top + rect.height);
   }
 }).then(() => {
-  console.log(rects);
+  const area = computeArea(rects, x, y);
+  console.log(area);
 });
