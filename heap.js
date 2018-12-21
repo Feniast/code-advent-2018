@@ -143,7 +143,7 @@
    * @param {Comparator} [comparator]
    * @return {Heap}
    */
-  remove(item, comparator = this.compare) {
+  remove(item, comparator) {
     // Find number of items to remove.
     const numberOfItemsToRemove = this.find(item, comparator).length;
 
@@ -184,14 +184,14 @@
 
   /**
    * @param {*} item
-   * @param {Comparator} [comparator]
+   * @param {Comparator} [equalsFunc]
    * @return {Number[]}
    */
-  find(item, comparator = this.compare) {
+  find(item, equalsFunc) {
     const foundItemIndices = [];
 
     for (let itemIndex = 0; itemIndex < this.heapContainer.length; itemIndex += 1) {
-      if (item === this.heapContainer[itemIndex]) {
+      if (equalsFunc(item, this.heapContainer[itemIndex])) {
         foundItemIndices.push(itemIndex);
       }
     }

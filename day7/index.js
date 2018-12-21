@@ -1,5 +1,5 @@
 const { readFile } = require('../util');
-const Heap = require('./heap');
+const Heap = require('../heap');
 
 const regexp = /^Step (\w+) must be finished before step (\w+) can begin.$/;
 
